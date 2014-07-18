@@ -7,11 +7,13 @@
     "express": "~3.4.4",
     "jade": "~1.4.2",
     "logfmt": "~1.1.2",
-    "sendgrid": "~1.0.4"
+    "sendgrid": "~1.0.4",
+    "mongodb": "^1.4.7"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",

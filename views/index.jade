@@ -2,4 +2,13 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p We're gonna collect yo bins
+
+  form(action='/signup', method='post')
+    input(type='text', name='email', placeholder='solid@snake.fox')
+    input(type='text', name='day', placeholder='thursday')
+    input(type='submit')
+
+  p Here is a picture of a cat
+
+  img(width='50%', src='images/cat.jpg')
