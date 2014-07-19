@@ -5,6 +5,7 @@
 
 var express = require('express');
 var schedule = require('node-schedule');
+var mongoose = require('mongoose');
 
 // Prod
 var sendgrid = require("sendgrid")(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
@@ -51,17 +52,44 @@ http.createServer(app).listen(app.get('port'), function(){
 var rule = new schedule.RecurrenceRule();
 rule.second = 1;
 
+// Map between days of week and numbers
+var days = [ "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" ];
+
 // Schedule job to send email
 var job = schedule.scheduleJob(rule, function() {
 
-  // If their bin needs collecting tomorrow, send an email!
-  sendgrid.send({
-    to:       'joebentley10@gmail.com',
-    from:     'other@example.com',
-    subject:  'Hello World',
-    text:     'My first email through SendGrid.'
-  }, function(err, json) {
-    if (err) { return console.error(err); }
-    console.log(json);
+  // Warn them a day in advance
+  var yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  var weekDay = days[yesterday.getDay()];
+
+  // Connect to db
+  var db = mongoose.connection;
+  db.on('error', console.error.bind(console, 'connection error:'));
+ 
+  db.once('open', function () {
+
+    var userSchema = mongoose.Schema({
+      email: String,
+      day: String
+    });
+
+    var User = mongoose.model('User', userSchema);
+
+    User.find({ day: weekDay }, function (err, user) {
+
+      // If their bin needs collecting tomorrow, send an email!
+      sendgrid.send({
+        to:       user.email,
+        from:     'other@example.com',
+        subject:  'Bins',
+        text:     'Your bins are being collected tomorrow!'
+      }, function(err, json) {
+        if (err) { return console.error(err); }
+        console.log(json);
+      });
+
+    });
+
   });
 });
