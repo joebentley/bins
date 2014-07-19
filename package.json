@@ -9,7 +9,8 @@
     "logfmt": "~1.1.2",
     "sendgrid": "~1.0.4",
     "mongodb": "^1.4.7",
-    "mongoose": "^3.8.13"
+    "mongoose": "^3.8.13",
+    "node-schedule": "^0.1.13"
   },
   "devDependencies": {},
   "scripts": {
