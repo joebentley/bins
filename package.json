@@ -8,7 +8,8 @@
     "jade": "~1.4.2",
     "logfmt": "~1.1.2",
     "sendgrid": "~1.0.4",
-    "mongodb": "^1.4.7"
+    "mongodb": "^1.4.7",
+    "mongoose": "^3.8.13"
   },
   "devDependencies": {},
   "scripts": {
