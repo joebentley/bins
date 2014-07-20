@@ -11,3 +11,8 @@ input {
   display: block;
   margin-top: 20px;
 }
+
+select {
+  display: block;
+  margin-top: 20px;
+}
