@@ -7,9 +7,10 @@ var express = require('express');
 var schedule = require('node-schedule');
 var mongoose = require('mongoose');
 var _ = require('underscore');
+var User = require('./user_model.js');
 
 // Prod
-//var sendgrid = require("sendgrid")(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+var sendgrid = require("sendgrid")(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 
 // Routes setup
 var routes = require('./routes');
@@ -64,27 +65,20 @@ var job = schedule.scheduleJob(rule, function() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   var weekDay = days[tomorrow.getDay()];
 
-  console.log(weekDay);
   // Connect to db
   // dev
-  mongoose.connect('mongodb://localhost/test');
+  //mongoose.connect('mongodb://localhost/test');
   // prod
-  //mongoose.connect(process.env.MONGOLAB_URI);
+  mongoose.connect(process.env.MONGOLAB_URI);
 
   var db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
  
   db.once('open', function () {
-
-    var userSchema = mongoose.Schema({
-      email: String,
-      day: String
-    });
-
-    var User = mongoose.model('User', userSchema);
     
     User.find({ day: weekDay }, function (err, users) {
-
+      if (err) return console.error(err);
+      console.log(users); 
       _.each(users, function (user) {
         // If their bin needs collecting tomorrow, send an email!
         
@@ -99,8 +93,9 @@ var job = schedule.scheduleJob(rule, function() {
         });
       });
 
+      // We have to call db.close() in this callback
+      db.close();
     });
 
-    mongoose.disconnect();
   });
 });
