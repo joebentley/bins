@@ -10,9 +10,9 @@ exports.post = function(req, res) {
   res.render('signup', { email: req.body.email, day: req.body.day });
   
   // dev
-  //mongoose.connect('mongodb://localhost/test');
+  mongoose.connect('mongodb://localhost/test');
   // prod
-  mongoose.connect(process.env.MONGOLAB_URI);
+  //mongoose.connect(process.env.MONGOLAB_URI);
 
   var db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
@@ -30,5 +30,7 @@ exports.post = function(req, res) {
     newUser.save(function (err, newUser) {
 
     });
+
+    mongoose.disconnect();
   });
 };

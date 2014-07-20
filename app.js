@@ -6,9 +6,10 @@
 var express = require('express');
 var schedule = require('node-schedule');
 var mongoose = require('mongoose');
+var _ = require('underscore');
 
 // Prod
-var sendgrid = require("sendgrid")(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+//var sendgrid = require("sendgrid")(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 
 // Routes setup
 var routes = require('./routes');
@@ -62,12 +63,13 @@ var job = schedule.scheduleJob(rule, function() {
   var tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   var weekDay = days[tomorrow.getDay()];
-  
+
+  console.log(weekDay);
   // Connect to db
   // dev
-  //mongoose.connect('mongodb://localhost/test');
+  mongoose.connect('mongodb://localhost/test');
   // prod
-  mongoose.connect(process.env.MONGOLAB_URI);
+  //mongoose.connect(process.env.MONGOLAB_URI);
 
   var db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
@@ -83,18 +85,22 @@ var job = schedule.scheduleJob(rule, function() {
     
     User.find({ day: weekDay }, function (err, users) {
 
-      // If their bin needs collecting tomorrow, send an email!
-      sendgrid.send({
-        to:       user.email,
-        from:     'other@example.com',
-        subject:  'Bins',
-        text:     'Your bins are being collected tomorrow!'
-      }, function(err, json) {
-        if (err) { return console.error(err); }
-        console.log(json);
+      _.each(users, function (user) {
+        // If their bin needs collecting tomorrow, send an email!
+        
+        sendgrid.send({
+          to:       user.email,
+          from:     'other@example.com',
+          subject:  'Bins',
+          text:     'Your bins are being collected tomorrow!'
+        }, function(err, json) {
+          if (err) { return console.error(err); }
+          console.log(json);
+        });
       });
 
     });
 
+    mongoose.disconnect();
   });
 });
