@@ -8,7 +8,7 @@ var schedule = require('node-schedule');
 var mongoose = require('mongoose');
 
 // Prod
-//var sendgrid = require("sendgrid")(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+var sendgrid = require("sendgrid")(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 
 // Routes setup
 var routes = require('./routes');
@@ -64,6 +64,11 @@ var job = schedule.scheduleJob(rule, function() {
   var weekDay = days[tomorrow.getDay()];
   
   // Connect to db
+  // dev
+  //mongoose.connect('mongodb://localhost/test');
+  // prod
+  mongoose.connect(process.env.MONGOLAB_URI);
+
   var db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
  
@@ -75,11 +80,10 @@ var job = schedule.scheduleJob(rule, function() {
     });
 
     var User = mongoose.model('User', userSchema);
+    
+    User.find({ day: weekDay }, function (err, users) {
 
-    User.find({ day: weekDay }, function (err, user) {
-
-      console.log("sent");
-      /*// If their bin needs collecting tomorrow, send an email!
+      // If their bin needs collecting tomorrow, send an email!
       sendgrid.send({
         to:       user.email,
         from:     'other@example.com',
@@ -88,7 +92,7 @@ var job = schedule.scheduleJob(rule, function() {
       }, function(err, json) {
         if (err) { return console.error(err); }
         console.log(json);
-      });*/
+      });
 
     });
 
