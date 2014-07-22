@@ -1,7 +1,7 @@
 
 
+.DS_Store
+.Trash
 *.swp
-
 data
-
 mongo
